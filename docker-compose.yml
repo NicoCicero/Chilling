@@ -1,0 +1,38 @@
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: chilling
+      POSTGRES_USER: chilling
+      POSTGRES_PASSWORD: chilling
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  backend:
+    build: ./backend
+    environment:
+      ASPNETCORE_URLS: http://0.0.0.0:8080
+      ConnectionStrings__Default: Host=db;Port=5432;Database=chilling;Username=chilling;Password=chilling
+      Admin__Key: "CAMBIAME-ESTA-KEY"
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+
+  frontend:
+    build: ./frontend
+    environment:
+      BACKEND_URL: http://backend:8080
+      NEXT_PUBLIC_API_BASE: ""
+    ports:
+    - "3000:3000"
+    depends_on:
+    - backend
+
+    
+
+
+volumes:
+  pgdata:
